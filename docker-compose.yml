@@ -1,0 +1,38 @@
+version: "3"
+
+services:
+  #Database
+  db:
+    image: mysql:5.7
+    volumes:
+      - db_data:/var/lib/mysql
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: password
+      MYSQL_DATABASE: wordpress
+      MYSQL_USER: wordpress
+      MYSQL_PASSWORD: wordpress
+    networks:
+      - myWPSite
+      #WordPress
+  wordpress:
+    depends_on:
+      - db
+    image: wordpress:latest
+    ports:
+      #map port 8000 on local to 80 in the container
+      - "8000:80"
+    restart: always
+    #WordPress image has apache this is web root
+    volumes: ["./:/var/www/html"]
+    environment:
+      #default port for mySQL
+      WORDPRESS_DB_HOST: db:3306
+      WORDPRESS_DB_USER: wordpress
+      WORDPRESS_DB_PASSWORD: wordpress
+    networks:
+      - myWPSite
+networks:
+  myWPSite:
+volumes:
+  db_data:
